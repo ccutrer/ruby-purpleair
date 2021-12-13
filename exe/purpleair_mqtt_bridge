@@ -37,10 +37,10 @@ data = purple.get.body
 
 homie = MQTT::Homie::Device.new(MQTT::Homie.escape_id(data["Geo"]), "PurpleAir Sensor", mqtt: ARGV[1])
 device = homie.node("device", "Device", "Device")
-device.property("temperature", "Current Temperature", :integer, data["current_temp_f"], unit: "ºF")
+device.property("temperature", "Current Temperature", :integer, data["current_temp_f"], unit: "°F")
 device.property("relative-humidity", "Current Relative Humidity", :integer, data["current_humidity"],
                 format: 0..100, unit: "%")
-device.property("dewpoint", "Current Dew Point", :integer, data["current_dewpoint_f"], unit: "ºF")
+device.property("dewpoint", "Current Dew Point", :integer, data["current_dewpoint_f"], unit: "°F")
 device.property("pressure", "Barometric Pressure", :integer, data["pressure"], unit: "hPA")
 device.property("rssi", "WiFi RSSI", :integer, data["rssi"], unit: "dB")
 
