@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    purpleair (0.0.1)
+    purpleair (0.0.2)
       faraday_middleware (~> 1.1)
       homie-mqtt (~> 1.4)
       net-http-persistent (~> 4.0)
@@ -33,9 +33,10 @@ GEM
     faraday-rack (1.0.0)
     faraday_middleware (1.1.0)
       faraday (~> 1.0)
-    homie-mqtt (1.4.4)
-      mqtt-ccutrer (~> 1.0)
-    mqtt-ccutrer (1.0.0)
+    homie-mqtt (1.6.0)
+      mqtt-ccutrer (~> 1.0, >= 1.0.1)
+      ruby2_keywords (~> 0.0.5)
+    mqtt-ccutrer (1.0.1)
     multipart-post (2.1.1)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
