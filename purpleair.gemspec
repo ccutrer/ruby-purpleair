@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 2.5"
 
   s.add_dependency "faraday_middleware", "~> 1.1"
-  s.add_dependency "homie-mqtt", "~> 1.4"
+  s.add_dependency "mqtt-homeassistant", "~> 0.1"
   s.add_dependency "net-http-persistent", "~> 4.0"
 
   s.add_development_dependency "byebug", "~> 9.0"

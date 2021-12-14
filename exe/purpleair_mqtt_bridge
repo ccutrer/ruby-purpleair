@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require "faraday_middleware"
-require "homie-mqtt"
+require "mqtt-homeassistant"
 require "optparse"
 
 refresh = 30.0
@@ -36,13 +36,51 @@ end
 data = purple.get.body
 
 homie = MQTT::Homie::Device.new(MQTT::Homie.escape_id(data["Geo"]), "PurpleAir Sensor", mqtt: ARGV[1])
+homie.home_assistant_device = {
+  manufacturer: "PurpleAir, Inc.",
+  sw_version: data["version"],
+  model: data["hardwarediscovered"]
+}
+
 device = homie.node("device", "Device", "Device")
-device.property("temperature", "Current Temperature", :integer, data["current_temp_f"], unit: "°F")
-device.property("relative-humidity", "Current Relative Humidity", :integer, data["current_humidity"],
-                format: 0..100, unit: "%")
-device.property("dewpoint", "Current Dew Point", :integer, data["current_dewpoint_f"], unit: "°F")
-device.property("pressure", "Barometric Pressure", :integer, data["pressure"], unit: "hPA")
-device.property("rssi", "WiFi RSSI", :integer, data["rssi"], unit: "dB")
+device.property("temperature",
+                "Current Temperature",
+                :integer,
+                data["current_temp_f"],
+                unit: "°F",
+                hass: { sensor: { device_class: :temperature,
+                                  state_class: :measurement } })
+device.property("relative-humidity",
+                "Current Relative Humidity",
+                :integer,
+                data["current_humidity"],
+                format: 0..100,
+                unit: "%",
+                hass: { sensor: { device_class: :humidity,
+                                  state_class: :measurement } })
+device.property("dewpoint",
+                "Current Dew Point",
+                :integer,
+                data["current_dewpoint_f"],
+                unit: "°F",
+                hass: { sensor: { device_class: :temperature,
+                                  icon: "mdi:water-opacity",
+                                  state_class: :measurement } })
+device.property("pressure",
+                "Barometric Pressure",
+                :integer,
+                data["pressure"],
+                unit: "hPA",
+                hass: { sensor: { device_class: :pressure,
+                                  state_class: :measurement } })
+device.property("rssi",
+                "WiFi RSSI",
+                :integer,
+                data["rssi"],
+                unit: "dB",
+                hass: { sensor: { device_class: :signal_strength,
+                                  state_class: :measurement,
+                                  entity_category: :diagnostic } })
 
 CHANNELS = %w[a b].freeze
 
@@ -71,16 +109,69 @@ end
 CHANNELS.each do |channel_id|
   fields = get_fields(data, channel_id)
   channel = homie.node(channel_id, "Sensor Channel #{channel_id.upcase}", "Air Sensor")
-  channel.property("pm2-5-aqi", "PM2.5 AQI", :integer, fields["pm2.5_aqi"])
-  channel.property("pm1-0-atm", "PM1.0", :float, fields["pm1_0_atm"], unit: "µg/m3")
-  channel.property("pm2-5-atm", "PM2.5", :float, fields["pm2_5_atm"], unit: "µg/m3")
-  channel.property("pm10-0-atm", "PM10", :float, fields["pm10_0_atm"], unit: "µg/m3")
-  channel.property("p-0-3-um", "# particles >= 0.3µm per decileter", :float, fields["p_0_3_um"])
-  channel.property("p-0-5-um", "# particles >= 0.5µm per decileter", :float, fields["p_0_5_um"])
-  channel.property("p-1-0-um", "# particles >= 1.0µm per decileter", :float, fields["p_1_0_um"])
-  channel.property("p-2-5-um", "# particles >= 2.5µm per decileter", :float, fields["p_2_5_um"])
-  channel.property("p-5-0-um", "# particles >= 5.0µm per decileter", :float, fields["p_5_0_um"])
-  channel.property("p-10-0-um", "# particles >= 10µm per decileter", :float, fields["p_10_0_um"])
+  channel.property("pm2-5-aqi",
+                   "PM2.5 AQI",
+                   :integer,
+                   fields["pm2.5_aqi"],
+                   hass: { sensor: { device_class: :aqi,
+                                     state_class: :measurement } })
+  channel.property("pm1-0-atm",
+                   "PM1.0",
+                   :float,
+                   fields["pm1_0_atm"],
+                   unit: "µg/m3",
+                   hass: { sensor: { device_class: :pm1,
+                                     state_class: :measurement } })
+  channel.property("pm2-5-atm",
+                   "PM2.5",
+                   :float,
+                   fields["pm2_5_atm"],
+                   unit: "µg/m3",
+                   hass: { sensor: { device_class: :pm25,
+                                     state_class: :measurement } })
+  channel.property("pm10-0-atm",
+                   "PM10",
+                   :float,
+                   fields["pm10_0_atm"],
+                   unit: "µg/m3",
+                   hass: { sensor: { device_class: :pm10,
+                                     state_class: :measurement } })
+  channel.property("p-0-3-um",
+                   "# particles >= 0.3µm per decileter",
+                   :float,
+                   fields["p_0_3_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
+  channel.property("p-0-5-um",
+                   "# particles >= 0.5µm per decileter",
+                   :float,
+                   fields["p_0_5_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
+  channel.property("p-1-0-um",
+                   "# particles >= 1.0µm per decileter",
+                   :float,
+                   fields["p_1_0_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
+  channel.property("p-2-5-um",
+                   "# particles >= 2.5µm per decileter",
+                   :float,
+                   fields["p_2_5_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
+  channel.property("p-5-0-um",
+                   "# particles >= 5.0µm per decileter",
+                   :float,
+                   fields["p_5_0_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
+  channel.property("p-10-0-um",
+                   "# particles >= 10µm per decileter",
+                   :float,
+                   fields["p_10_0_um"],
+                   hass: { sensor: { state_class: :measurement,
+                                     entity_category: :diagnostic } })
 end
 
 homie.publish
