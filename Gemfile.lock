@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    purpleair (0.0.3)
+    purpleair (0.0.4)
       faraday_middleware (~> 1.1)
       mqtt-homeassistant (~> 0.1)
       net-http-persistent (~> 4.0)
