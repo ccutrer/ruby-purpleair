@@ -44,6 +44,8 @@ device.property("dewpoint", "Current Dew Point", :integer, data["current_dewpoin
 device.property("pressure", "Barometric Pressure", :integer, data["pressure"], unit: "hPA")
 device.property("rssi", "WiFi RSSI", :integer, data["rssi"], unit: "dB")
 
+CHANNELS = %w[a b].freeze
+
 FIELDS = %w[
   pm2.5_aqi
   pm1_0_atm
@@ -66,7 +68,7 @@ def get_fields(data, channel_id)
   result
 end
 
-%w[a b].each do |channel_id|
+CHANNELS.each do |channel_id|
   fields = get_fields(data, channel_id)
   channel = homie.node(channel_id, "Sensor Channel #{channel_id.upcase}", "Air Sensor")
   channel.property("pm2-5-aqi", "PM2.5 AQI", :integer, fields["pm2.5_aqi"])
@@ -91,7 +93,7 @@ loop do
   device["pressure"].value = data["pressure"]
   device["rssi"].value = data["rssi"]
 
-  %w[a b].each do |channel_id|
+  CHANNELS.each do |channel_id|
     fields = get_fields(data, channel_id)
     channel = homie[channel_id]
     FIELDS.each do |field|

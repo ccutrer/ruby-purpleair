@@ -9,6 +9,9 @@ Gem::Specification.new do |s|
   s.homepage = "https://github.com/ccutrer/ruby-purpleair"
   s.summary = "Publish PurpleAir sensor data to mqtt"
   s.license = "MIT"
+  s.metadata = {
+    "rubygems_mfa_required" => "true"
+  }
 
   s.bindir = "exe"
   s.executables = Dir["exe/*"].map { |f| File.basename(f) }
@@ -23,5 +26,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "byebug", "~> 9.0"
   s.add_development_dependency "rake", "~> 13.0"
   s.add_development_dependency "rubocop", "~> 1.19"
+  s.add_development_dependency "rubocop-performance", "~> 1.12"
   s.add_development_dependency "rubocop-rake", "~> 0.6"
 end
