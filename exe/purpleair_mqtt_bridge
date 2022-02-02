@@ -178,17 +178,19 @@ homie.publish
 
 loop do
   data = purple.get.body
-  device["temperature"].value = data["current_temp_f"]
-  device["relative-humidity"].value = data["current_humidity"]
-  device["dewpoint"].value = data["current_dewpoint_f"]
-  device["pressure"].value = data["pressure"]
-  device["rssi"].value = data["rssi"]
+  homie.mqtt.batch_publish do
+    device["temperature"].value = data["current_temp_f"]
+    device["relative-humidity"].value = data["current_humidity"]
+    device["dewpoint"].value = data["current_dewpoint_f"]
+    device["pressure"].value = data["pressure"]
+    device["rssi"].value = data["rssi"]
 
-  CHANNELS.each do |channel_id|
-    fields = get_fields(data, channel_id)
-    channel = homie[channel_id]
-    FIELDS.each do |field|
-      channel[field.gsub(/[._]/, "-")].value = fields[field]
+    CHANNELS.each do |channel_id|
+      fields = get_fields(data, channel_id)
+      channel = homie[channel_id]
+      FIELDS.each do |field|
+        channel[field.gsub(/[._]/, "-")].value = fields[field]
+      end
     end
   end
 
