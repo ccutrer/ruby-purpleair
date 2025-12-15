@@ -70,7 +70,7 @@ device.property("pressure",
                 "Barometric Pressure",
                 :integer,
                 data["pressure"],
-                unit: "hPA",
+                unit: "hPa",
                 hass: { sensor: { device_class: :pressure,
                                   state_class: :measurement } })
 device.property("rssi",
