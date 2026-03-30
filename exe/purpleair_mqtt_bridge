@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require "faraday_middleware"
-require "mqtt-homeassistant"
+require "mqtt/homie/home_assistant"
 require "optparse"
 
 refresh = 30.0
@@ -35,7 +35,7 @@ end
 
 data = purple.get.body
 
-homie = MQTT::Homie::Device.new(MQTT::Homie.escape_id(data["Geo"]), "PurpleAir Sensor", mqtt: ARGV[1])
+homie = MQTT::Homie::Device.new(MQTT::Homie.escape_id(data["Geo"]), "PurpleAir Sensor", mqtt: { uri: ARGV[1], reconnect_limit: 3 })
 homie.home_assistant_device = {
   manufacturer: "PurpleAir, Inc.",
   sw_version: data["version"],
@@ -71,7 +71,7 @@ device.property("pressure",
                 :integer,
                 data["pressure"],
                 unit: "hPa",
-                hass: { sensor: { device_class: :pressure,
+                hass: { sensor: { device_class: :atmospheric_pressure,
                                   state_class: :measurement } })
 device.property("rssi",
                 "WiFi RSSI",
